@@ -3,6 +3,7 @@ package com.example.a36_pagergallerysave
 
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -31,6 +32,14 @@ class GalleryFragment : Fragment() {
                 swipeLayoutGallery.isRefreshing = true
                 Handler().postDelayed({galleryViewModel.resetQuery() },1000)
             }
+
+            /*
+                点击重新刷新
+                网络状态有问题时
+             */
+            R.id.menuRetry -> {
+                galleryViewModel.retry()
+            }
         }
 
         return super.onOptionsItemSelected(item)
@@ -51,7 +60,7 @@ class GalleryFragment : Fragment() {
 
         }
 
-        galleryViewModel.pageListLiveData.observe(viewLifecycleOwner, Observer {
+        galleryViewModel.pagedListLiveData.observe(viewLifecycleOwner, Observer {
             galleryAdapter.submitList(it)
             //数据加载出来好后，不让它再转动
             swipeLayoutGallery.isRefreshing = false
@@ -63,6 +72,13 @@ class GalleryFragment : Fragment() {
         swipeLayoutGallery.setOnRefreshListener{
             galleryViewModel.resetQuery()
         }
+
+        /*
+               观察networkStatus状态的变化
+         */
+        galleryViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
+            Log.d("hello","onActivityCreated: $it")
+        })
 
     }
 
